@@ -1,4 +1,5 @@
 /* ============ DATA PRODUK ============ */
+/* Menggunakan Font Awesome icons, bukan emoji */
 const products = [
   { id:1, name:"Knalpot Racing R25 Full System", brand:"Akrapovic", price:2500000, oldPrice:3000000, cat:"knalpot", image:"knalpot-racing-r25.jpg", icon:'<i class="fa-solid fa-fire"></i>', stock:12, badge:"HOT", rating:4.8, sold:156, desc:"Knalpot full system racing dengan performa maksimal. Bahan stainless steel anti karat, suara bass menggelegar. Cocok untuk motor sport 250cc." },
   { id:2, name:"Knalpot Standar Vario 125", brand:"AHM Original", price:450000, oldPrice:550000, cat:"knalpot", image:"knalpot-vario-125.jpg", icon:'<i class="fa-solid fa-fire"></i>', stock:25, rating:4.6, sold:320, desc:"Knalpot standar original AHM untuk Honda Vario 125. Dijamin original, awet, dan suara senyap sesuai standar pabrik." },
@@ -55,7 +56,7 @@ const saveState = () => {
 /* ============ HELPER: RENDER GAMBAR PRODUK ============ */
 function renderProductMedia(p) {
   if (p.image) {
-    return `<img src="${p.image}" alt="${p.name}" onerror="this.parentElement.innerHTML='<span style=\\'font-size:60px;color:#d32f2f\\'>${p.icon}</span>'">`;
+    return `<img src="${p.image}" alt="${p.name}" onerror="this.parentElement.innerHTML='<span style=\\'font-size:50px;color:#d32f2f\\'>${p.icon}</span>'">`;
   }
   return p.icon;
 }
@@ -142,12 +143,12 @@ function renderProductCards(list) {
   }
   return list.map(p => {
     const inWishlist = wishlist.includes(p.id);
-    const heartIcon = inWishlist ? '<i class="fa-solid fa-heart"></i>' : '<i class="fa-regular fa-heart"></i>';
+    const heartClass = inWishlist ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
     return `
       <div class="product-card" onclick="openDetail(${p.id})">
         ${p.badge ? `<span class="badge">${p.badge}</span>` : ''}
         <button class="wishlist-heart ${inWishlist?'active':''}" onclick="event.stopPropagation(); toggleWishlist(${p.id}, this)">
-          ${heartIcon}
+          <i class="${heartClass}"></i>
         </button>
         <div class="product-img">${renderProductMedia(p)}</div>
         <div class="product-info">
@@ -176,7 +177,7 @@ function openDetail(productId) {
   const catName = categories.find(c => c.id === p.cat)?.name || p.cat;
   const inWishlist = wishlist.includes(p.id);
   const related = products.filter(x => x.cat === p.cat && x.id !== p.id).slice(0, 4);
-  const heartIcon = inWishlist ? '<i class="fa-solid fa-heart"></i>' : '<i class="fa-regular fa-heart"></i>';
+  const heartClass = inWishlist ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
 
   document.getElementById('breadcrumb').style.display = 'block';
   document.getElementById('bcCurrent').textContent = p.name;
@@ -190,7 +191,7 @@ function openDetail(productId) {
       <div class="rating" style="margin-bottom:10px"><i class="fa-solid fa-star"></i> ${p.rating} · ${p.sold} terjual</div>
       <div class="detail-price">${formatRupiah(p.price)}</div>
       ${p.oldPrice ? `<div class="detail-old-price">${formatRupiah(p.oldPrice)}</div>` : ''}
-      ${discount > 0 ? `<div class="detail-discount"><i class="fa-solid fa-fire"></i> Diskon ${discount}%</div>` : ''}
+      ${discount > 0 ? `<div class="detail-discount">Diskon ${discount}%</div>` : ''}
       <div><div class="detail-stock"><i class="fa-solid fa-check"></i> Stok tersedia: ${p.stock} unit</div></div>
 
       <div class="detail-desc">
@@ -210,7 +211,7 @@ function openDetail(productId) {
       </div>
       <button class="btn-buy-now" onclick="buyNow(${p.id})"><i class="fa-solid fa-bolt"></i> Beli Sekarang</button>
       <button class="btn-secondary" onclick="toggleWishlist(${p.id}, this)">
-        ${heartIcon} ${inWishlist ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist'}
+        <i class="${heartClass}"></i> ${inWishlist ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist'}
       </button>
 
       ${related.length ? `
@@ -219,7 +220,7 @@ function openDetail(productId) {
           <div class="products" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
             ${related.map(r => `
               <div class="product-card" onclick="openDetail(${r.id})" style="cursor:pointer">
-                <div class="product-img" style="height:120px;font-size:40px">${renderProductMedia(r)}</div>
+                <div class="product-img" style="height:120px;font-size:36px">${renderProductMedia(r)}</div>
                 <div class="product-info" style="padding:10px">
                   <h3 style="font-size:13px;min-height:auto">${r.name}</h3>
                   <div class="price" style="font-size:14px;margin-top:5px">${formatRupiah(r.price)}</div>
@@ -270,12 +271,11 @@ function toggleWishlist(id, el) {
   if (el && el.classList) {
     const active = wishlist.includes(id);
     el.classList.toggle('active', active);
-    if (el.tagName === 'BUTTON') {
-      if (el.classList.contains('wishlist-heart')) {
-        el.innerHTML = active ? '<i class="fa-solid fa-heart"></i>' : '<i class="fa-regular fa-heart"></i>';
-      } else {
-        el.innerHTML = (active ? '<i class="fa-solid fa-heart"></i> Hapus dari Wishlist' : '<i class="fa-regular fa-heart"></i> Tambah ke Wishlist');
-      }
+    const icon = el.querySelector('i');
+    if (icon) {
+      icon.className = active ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+    } else if (el.tagName === 'BUTTON' && el.textContent.includes('Wishlist')) {
+      el.innerHTML = `<i class="${active ? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i> ${active ? 'Hapus dari Wishlist' : 'Tambah ke Wishlist'}`;
     }
   }
 }
@@ -284,7 +284,7 @@ function openWishlist() {
   if (wishlist.length === 0) {
     document.getElementById('wishlistProducts').innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <div class="icon"><i class="fa-solid fa-heart"></i></div>
+        <div class="icon"><i class="fa-regular fa-heart"></i></div>
         <h3>Wishlist masih kosong</h3>
         <p>Tambahkan produk favorit Anda</p>
         <button class="btn-primary" style="max-width:200px;margin:0 auto" onclick="goHome()">Mulai Belanja</button>
@@ -503,9 +503,9 @@ function openOrders() {
           ${o.items.map(i => `• ${i.name} × ${i.qty}`).join('<br>')}
         </div>
         <div style="font-size:13px;color:#666;margin-top:10px">
-          <i class="fa-solid fa-location-dot"></i> ${o.customer.name} · ${o.customer.phone}<br>
+          ${o.customer.name} · ${o.customer.phone}<br>
           ${o.customer.address}, ${o.customer.city}<br>
-          <i class="fa-solid fa-wallet"></i> ${o.payment} · <i class="fa-solid fa-truck"></i> ${o.shipping_method}
+          ${o.payment} · ${o.shipping_method}
         </div>
         <div class="order-total">
           <span>Total</span>
@@ -519,10 +519,10 @@ function openOrders() {
 
 function statusLabel(s) {
   return {
-    pending: '<i class="fa-solid fa-clock"></i> Menunggu',
-    processed: '<i class="fa-solid fa-circle-check"></i> Diproses',
-    shipped: '<i class="fa-solid fa-truck"></i> Dikirim',
-    completed: '<i class="fa-solid fa-trophy"></i> Selesai'
+    pending: 'Menunggu',
+    processed: 'Diproses',
+    shipped: 'Dikirim',
+    completed: 'Selesai'
   }[s] || s;
 }
 
@@ -595,15 +595,16 @@ function openProfile() {
   if (!currentUser) { showPage('login'); return; }
   document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
   document.getElementById('profileName').textContent = currentUser.name;
-  document.getElementById('profileEmail').innerHTML = '<i class="fa-solid fa-envelope"></i> ' + currentUser.email;
-  document.getElementById('profilePhone').innerHTML = '<i class="fa-solid fa-phone"></i> ' + (currentUser.phone || '-');
+  document.getElementById('profileEmail').innerHTML = currentUser.email;
+  document.getElementById('profilePhone').innerHTML = currentUser.phone || '-';
   showPage('profile');
 }
 
 /* ============ TOAST ============ */
 function showToast(msg, isError = false) {
   const toast = document.getElementById('toast');
-  toast.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-check'}"></i> ${msg}`;
+  const icon = isError ? '<i class="fa-solid fa-triangle-exclamation"></i>' : '<i class="fa-solid fa-check"></i>';
+  toast.innerHTML = `${icon} ${msg}`;
   toast.classList.toggle('error', isError);
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2500);
